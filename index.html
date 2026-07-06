@@ -1,40 +1,24 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>BrightNest Oracle</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+<script>
+    const statusDiv = document.getElementById('status');
+    statusDiv.innerText = "جاري الاتصال...";
 
-    <div id="status">جاري الاتصال بقاعدة البيانات...</div>
-
-    <script>
-        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co'; 
-        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
-
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        async function init() {
-            const statusDiv = document.getElementById('status');
-            try {
-                const { data, error } = await supabase
-                    .from('signals')
-                    .select('*');
-                
-                if (error) {
-                    statusDiv.innerHTML = "خطأ من قاعدة البيانات: " + error.message;
-                    console.error(error);
-                } else {
-                    statusDiv.innerHTML = "نجح الاتصال! عدد السجلات المجلوبة: " + data.length;
-                    console.log("البيانات:", data);
-                }
-            } catch (err) {
-                statusDiv.innerHTML = "خطأ غير متوقع: " + err.message;
-            }
+    // نستخدم timeout بسيط لإجبار الموقع على إظهار خطأ إذا تأخر الاتصال أكثر من 5 ثوانٍ
+    const timer = setTimeout(() => {
+        if(statusDiv.innerText === "جاري الاتصال...") {
+            statusDiv.innerText = "خطأ: لم يتم الرد من قاعدة البيانات. تأكد من توفر الإنترنت أو إعدادات الشبكة.";
         }
+    }, 5000);
 
-        init();
-    </script>
-</body>
-</html>
+    const supabase = supabase.createClient('https://bnfwhlvtxemldrcrhvhg.supabase.co', 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik');
+    
+    supabase.from('signals').select('*').then(({ data, error }) => {
+        clearTimeout(timer);
+        if (error) {
+            statusDiv.innerText = "خطأ من Supabase: " + error.message;
+        } else {
+            statusDiv.innerText = "نجح الاتصال! عدد السجلات: " + (data ? data.length : 0);
+        }
+    }).catch(err => {
+        statusDiv.innerText = "خطأ استثنائي: " + err.message;
+    });
+</script>
