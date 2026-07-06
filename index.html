@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>BrightNest Oracle</title>
-    <!-- استدعاء مكتبة Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -11,29 +10,27 @@
     <div id="status">جاري الاتصال بقاعدة البيانات...</div>
 
     <script>
-        // إعدادات Supabase
         const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co'; 
-        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik;
+        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
 
-        // تهيئة العميل
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function init() {
+            const statusDiv = document.getElementById('status');
             try {
-                // محاولة جلب بيانات من جدول signals
                 const { data, error } = await supabase
                     .from('signals')
-                    .select('*')
-                    .limit(1);
+                    .select('*');
                 
                 if (error) {
-                    document.getElementById('status').innerText = "خطأ من قاعدة البيانات: " + error.message;
+                    statusDiv.innerHTML = "خطأ من قاعدة البيانات: " + error.message;
+                    console.error(error);
                 } else {
-                    document.getElementById('status').innerText = "نجح الاتصال! تم جلب البيانات بنجاح.";
-                    console.log(data); // يمكنك رؤية البيانات في كونسول المتصفح
+                    statusDiv.innerHTML = "نجح الاتصال! عدد السجلات المجلوبة: " + data.length;
+                    console.log("البيانات:", data);
                 }
             } catch (err) {
-                document.getElementById('status').innerText = "خطأ غير متوقع: " + err.message;
+                statusDiv.innerHTML = "خطأ غير متوقع: " + err.message;
             }
         }
 
