@@ -1,39 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>منصة التداول</title>
-    <!-- 1. نضع مكتبة Supabase هنا في الأعلى -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- الرابط الجديد الموثوق للمكتبة -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
-    <!-- هذا هو المربع الذي سيظهر فيه النتيجة -->
-    <div id="chart-container">انتظر...</div>
+    <div id="chart-container" style="font-family: sans-serif; padding: 20px;">بدء التحميل...</div>
 
-    <!-- 2. نضع كود الاتصال الخاص بك هنا -->
     <script>
+        // إعدادات الاتصال
         const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
         const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfUNB3Ik';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        async function checkConnection() {
-            const container = document.getElementById('chart-container');
-            container.innerText = "جاري الفحص...";
-            
-            try {
-                const { data, error } = await supabase.from('signals').select('*');
-                
-                if (error) {
-                    container.innerText = "خطأ الاتصال: " + error.message;
-                } else {
-                    container.innerText = "نجح الاتصال! عدد البيانات هو: " + data.length;
-                }
-            } catch (e) {
-                container.innerText = "خطأ في الكود: " + e.message;
-            }
-        }
         
-        checkConnection();
+        // التحقق من تعريف المكتبة
+        const container = document.getElementById('chart-container');
+        
+        if (typeof supabase === 'undefined') {
+            container.innerText = "خطأ: لم يتم تحميل مكتبة Supabase. تأكد من اتصال الإنترنت.";
+        } else {
+            const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+            async function checkConnection() {
+                container.innerText = "جاري الاتصال بقاعدة البيانات...";
+                
+                try {
+                    const { data, error } = await client.from('signals').select('*');
+                    
+                    if (error) {
+                        container.innerText = "خطأ من قاعدة البيانات: " + error.message;
+                    } else {
+                        container.innerText = "نجح الاتصال! عدد البيانات هو: " + data.length;
+                    }
+                } catch (e) {
+                    container.innerText = "خطأ غير متوقع: " + e.message;
+                }
+            }
+            
+            checkConnection();
+        }
     </script>
 
 </body>
