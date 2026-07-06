@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>BrightNest Binary Trading</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>مرحبًا بك في منصة التداول</h1>
+
+    <!-- هذا هو المربع الذي ستظهر فيه البيانات -->
+    <div id="chart-container">
+        جاري تحميل البيانات...
+    </div>
+
+    <!-- استيراد مكتبة Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
+        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
+
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function updateUI() {
+            try {
+                const { data, error } = await supabase
+                    .from('signals')
+                    .select('*');
+
+                if (error) {
+                    document.getElementById('chart-container').innerText = 'خطأ من Supabase: ' + error.message;
+                } else {
+                    document.getElementById('chart-container').innerText = JSON.stringify(data, null, 2);
+                }
+            } catch (err) {
+                console.error('فشل الاتصال:', err);
+                document.getElementById('chart-container').innerText = 'حدث خطأ: ' + err.message;
+            }
+        }
+
+        // تشغيل الدالة عند تحميل الصفحة
+        updateUI();
+    </script>
+</body>
+</html>
