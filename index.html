@@ -2,32 +2,39 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>BrightNest Oracle - Auto Sync</title>
+    <title>SignalXpert Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #050505; color: #fff; padding: 10px; }
-        h2 { text-align: center; color: #0ff; text-shadow: 0 0 10px #0ff; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #1a1a1a; color: #f0f; padding: 12px; border-bottom: 2px solid #f0f; }
-        td { padding: 12px; border-bottom: 1px solid #333; text-align: center; color: #fff; }
-        .buy { color: #0f0; text-shadow: 0 0 8px #0f0; }
-        .sell { color: #f00; text-shadow: 0 0 8px #f00; }
-        .wait { color: #ff0; text-shadow: 0 0 8px #ff0; }
+        body { font-family: 'Poppins', sans-serif; background: #0c0b1a; color: #fff; margin: 0; padding: 20px; }
+        h2 { text-align: center; color: #b794f4; text-shadow: 0 0 15px #b794f4; margin-bottom: 30px; }
+        
+        /* تصميم البطاقات الاحترافي */
+        .signal-card {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .signal-card:hover { transform: scale(1.02); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .symbol { font-size: 1.5em; font-weight: 600; color: #fff; }
+        .price { font-size: 1.2em; color: #00d4ff; }
+        .direction { padding: 8px 15px; border-radius: 10px; font-weight: bold; }
+        
+        /* ألوان النيون */
+        .buy { background: rgba(0, 255, 127, 0.1); color: #00ff7f; border: 1px solid #00ff7f; }
+        .sell { background: rgba(255, 69, 58, 0.1); color: #ff453a; border: 1px solid #ff453a; }
+        .wait { background: rgba(255, 215, 0, 0.1); color: #ffd700; border: 1px solid #ffd700; }
+        
+        .footer-info { margin-top: 10px; display: flex; justify-content: space-between; color: #888; }
     </style>
 </head>
 <body>
-    <h2>إشارات BrightNest Oracle</h2>
-    <div id="status" style="text-align:center;">جاري الاتصال...</div>
-    <table id="signalsTable" style="display:none;">
-        <thead>
-            <tr>
-                <th>الزوج</th>
-                <th>الإشارة</th>
-                <th>السعر</th>
-                <th>النسبة</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+    <h2>Signals Live Dashboard</h2>
+    <div id="container"></div>
 
     <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
@@ -37,31 +44,30 @@
 
         async function loadSignals() {
             const { data, error } = await client.from('signals').select('*');
-            if (error) {
-                document.getElementById('status').innerText = "خطأ: " + error.message;
-                return;
-            }
+            if (error) return;
 
-            document.getElementById('status').style.display = 'none';
-            document.getElementById('signalsTable').style.display = 'table';
-            const body = document.getElementById('tableBody');
-            body.innerHTML = "";
+            const container = document.getElementById('container');
+            container.innerHTML = "";
             
             data.forEach(item => {
-                // الكود الذكي: يبحث عن اسم العمود بأي صيغة كانت
-                let asset = item.asset || item.Asset || 'N/A';
-                let dir = item.direction || item.Direction || 'انتظار';
-                let price = item.price || item.Price || '0.00';
-                let per = item.percentage || item.Percentage || '0';
+                let asset = item.asset || 'N/A';
+                let dir = item.direction || 'انتظار';
+                let price = item.price || '0.00';
+                let per = item.percentage || '0';
 
-                let signalClass = dir === 'شراء' ? 'buy' : (dir === 'بيع' ? 'sell' : 'wait');
+                let dirClass = dir === 'شراء' ? 'buy' : (dir === 'بيع' ? 'sell' : 'wait');
                 
-                body.innerHTML += `<tr>
-                    <td>${asset}</td>
-                    <td class="${signalClass}">${dir}</td>
-                    <td>${price}</td>
-                    <td>${per}%</td>
-                </tr>`;
+                container.innerHTML += `
+                    <div class="signal-card">
+                        <div class="card-header">
+                            <span class="symbol">${asset}</span>
+                            <span class="direction ${dirClass}">${dir}</span>
+                        </div>
+                        <div class="footer-info">
+                            <span>السعر: ${price}</span>
+                            <span>النسبة: ${per}%</span>
+                        </div>
+                    </div>`;
             });
         }
         
