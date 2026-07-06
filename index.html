@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>BrightNest Oracle</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div id="status">جاري الاتصال بقاعدة البيانات...</div>
+
+    <script>
+        // ضع قيمك الخاصة هنا بعد نسخها من لوحة تحكم Supabase
+        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co; 
+        const supabaseKey = 'sb_publishable_ijdKGohEzJI0XKS8UeT6-g_oYQnpjRg';
+
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function init() {
+            try {
+                // ملاحظة: تأكد من وجود جدول اسمه 'test_table' في قاعدة بياناتك، أو غيره باسم جدول موجود لديك
+                const { data, error } = await supabase.from('test_table').select('*').limit(1);
+                
+                if (error) {
+                    document.getElementById('status').innerText = "خطأ من قاعدة البيانات: " + error.message;
+                } else {
+                    document.getElementById('status').innerText = "نجح الاتصال!";
+                }
+            } catch (err) {
+                document.getElementById('status').innerText = "خطأ غير متوقع: " + err.message;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
