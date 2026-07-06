@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>منصة التداول</title>
-    <!-- الرابط الجديد الموثوق للمكتبة -->
+    <!-- تحميل مكتبة Supabase -->
     <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
@@ -11,15 +11,14 @@
     <div id="chart-container" style="font-family: sans-serif; padding: 20px;">بدء التحميل...</div>
 
     <script>
-        // إعدادات الاتصال
+        // إعدادات الاتصال المعتمدة
         const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
-        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfUNB3Ik';
+        const supabaseKey = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuZndobHZ0eGVtbGRyY3JodmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODE4MjcsImV4cCI6MjA5ODY1NzgyN30.z59cojcXqDm4QLn-RapnquWYbFzsjbMVNTV4RAH1kfg';
         
-        // التحقق من تعريف المكتبة
         const container = document.getElementById('chart-container');
         
         if (typeof supabase === 'undefined') {
-            container.innerText = "خطأ: لم يتم تحميل مكتبة Supabase. تأكد من اتصال الإنترنت.";
+            container.innerText = "خطأ: لم يتم تحميل مكتبة Supabase.";
         } else {
             const client = supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -27,6 +26,7 @@
                 container.innerText = "جاري الاتصال بقاعدة البيانات...";
                 
                 try {
+                    // محاولة جلب البيانات من جدول signals
                     const { data, error } = await client.from('signals').select('*');
                     
                     if (error) {
