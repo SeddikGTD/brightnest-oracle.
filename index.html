@@ -1,51 +1,31 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signals Live</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { background: #0c0b1a; color: #fff; font-family: sans-serif; padding: 20px; }
-        .signal-card { background: #1a1a2e; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; }
-    </style>
-</head>
-<body>
-    <h1>الإشارات الحية</h1>
-    <div id="signals-container">جاري التحميل...</div>
+<script>
+    const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
+    const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
+    const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-    <script>
-        // إعداد الاتصال بقاعدة البيانات
-        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
-        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
-        const client = supabase.createClient(supabaseUrl, supabaseKey);
-
-        async function fetchSignals() {
-            const container = document.getElementById('signals-container');
-            const { data, error } = await client.from('signals').select('*');
-            
-            if (error) {
-                container.innerHTML = "خطأ في جلب البيانات: " + error.message;
-                return;
-            }
-
-            container.innerHTML = ''; // تفريغ الحاوية
-            if (data && data.length > 0) {
-                data.forEach(signal => {
-                    container.innerHTML += `
-                        <div class="signal-card">
-                            <strong>${signal.asset || 'بدون اسم'}</strong><br>
-                            الاتجاه: ${signal.direction || 'غير محدد'} | الثقة: ${signal.confidence || 0}%
-                        </div>
-                    `;
-                });
-            } else {
-                container.innerHTML = "لا توجد إشارات حالياً.";
-            }
+    async function fetchSignals() {
+        const container = document.getElementById('signals-container');
+        // جلب البيانات من جدول signals
+        const { data, error } = await client.from('signals').select('*');
+        
+        if (error) {
+            console.error("خطأ:", error);
+            return;
         }
 
-        // تشغيل الدالة
-        fetchSignals();
-    </script>
-</body>
-</html>
+        container.innerHTML = ''; 
+        if (data && data.length > 0) {
+            data.forEach(signal => {
+                container.innerHTML += `
+                    <div class="signal-card">
+                        <strong>${signal.asset || 'بدون اسم'}</strong><br>
+                        الاتجاه: ${signal.direction || 'غير محدد'} | الثقة: ${signal.confidence || 0}%
+                    </div>
+                `;
+            });
+        } else {
+            container.innerHTML = "<p>لا توجد إشارات حالياً في قاعدة البيانات.</p>";
+        }
+    }
+    fetchSignals();
+</script>
