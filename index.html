@@ -1,24 +1,6 @@
-<script>
-    const statusDiv = document.getElementById('status');
-    statusDiv.innerText = "جاري الاتصال...";
-
-    // نستخدم timeout بسيط لإجبار الموقع على إظهار خطأ إذا تأخر الاتصال أكثر من 5 ثوانٍ
-    const timer = setTimeout(() => {
-        if(statusDiv.innerText === "جاري الاتصال...") {
-            statusDiv.innerText = "خطأ: لم يتم الرد من قاعدة البيانات. تأكد من توفر الإنترنت أو إعدادات الشبكة.";
-        }
-    }, 5000);
-
-    const supabase = supabase.createClient('https://bnfwhlvtxemldrcrhvhg.supabase.co', 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik');
-    
-    supabase.from('signals').select('*').then(({ data, error }) => {
-        clearTimeout(timer);
-        if (error) {
-            statusDiv.innerText = "خطأ من Supabase: " + error.message;
-        } else {
-            statusDiv.innerText = "نجح الاتصال! عدد السجلات: " + (data ? data.length : 0);
-        }
-    }).catch(err => {
-        statusDiv.innerText = "خطأ استثنائي: " + err.message;
-    });
-</script>
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>الموقع يعمل الآن بنجاح!</h1>
+</body>
+</html>
