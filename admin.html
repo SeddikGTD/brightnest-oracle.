@@ -1,57 +1,20 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - إضافة إشارة</title>
-    <style>
-        body { background: #0c0b1a; color: #fff; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        h2 { color: #b794f4; }
-        input, select, button { width: 100%; max-width: 400px; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #1a1a2e; color: #fff; }
-        button { background: #b794f4; color: white; font-weight: bold; cursor: pointer; border: none; }
-        button:hover { background: #9f7aea; }
-    </style>
-</head>
-<body>
-    <h2>إضافة إشارة جديدة</h2>
-    <input type="text" id="asset" placeholder="الزوج (مثلاً EUR/USD)">
-    <select id="direction">
-        <option value="شراء">شراء</option>
-        <option value="بيع">بيع</option>
-    </select>
-    <input type="number" id="confidence" placeholder="نسبة الثقة (مثلاً 90)">
-    <button onclick="addSignal()">إرسال الإشارة</button>
+<script>
+    const client = supabase.createClient('https://bnfwhlvtxemldrcrhvhg.supabase.co', 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik');
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // إعداد الاتصال بقاعدة البيانات
-        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
-        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
-        const client = supabase.createClient(supabaseUrl, supabaseKey);
+    async function addSignal() {
+        const asset = document.getElementById('asset').value;
+        const direction = document.getElementById('direction').value;
+        const confidence = parseInt(document.getElementById('confidence').value);
 
-        async function addSignal() {
-            const asset = document.getElementById('asset').value;
-            const direction = document.getElementById('direction').value;
-            const confidence = document.getElementById('confidence').value;
-
-            if (!asset || !confidence) {
-                alert("يرجى تعبئة جميع الحقول!");
-                return;
-            }
-
-            const { data, error } = await client.from('signals').insert([
-                { asset: asset, direction: direction, confidence: parseInt(confidence) }
-            ]);
-            
-            if (error) {
-                alert("خطأ: " + error.message);
-            } else {
-                alert("تمت إضافة الإشارة بنجاح!");
-                // تفريغ الحقول بعد الإضافة
-                document.getElementById('asset').value = '';
-                document.getElementById('confidence').value = '';
-            }
+        const { data, error } = await client.from('signals').insert([
+            { asset: asset, direction: direction, confidence: confidence }
+        ]);
+        
+        if (error) {
+            // هذا التنبيه سيخبرنا بالخطأ الحقيقي (مثلاً: Column not found)
+            alert("خطأ قاعدة البيانات: " + error.message + "\nالتفاصيل: " + error.details);
+        } else {
+            alert("تمت إضافة الإشارة بنجاح!");
         }
-    </script>
-</body>
-</html>
+    }
+</script>
