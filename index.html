@@ -2,52 +2,52 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BrightNest Oracle</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #0c0b1a; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
-        .signal-card { border: 1px solid #4e4e6a; padding: 15px; margin: 10px auto; border-radius: 10px; max-width: 300px; background: #1a1a2e; }
+        .signal-card { background: #1a1a2e; border: 1px solid #4e4e6a; padding: 15px; margin: 10px auto; border-radius: 10px; max-width: 350px; }
     </style>
 </head>
 <body>
     <h1>إشارات التداول</h1>
-    <div id="signals-container">جاري تحميل الإشارات...</div>
+    <div id="signals-container">جارٍ البحث عن الإشارات...</div>
 
     <script>
-        const supabase = supabase.createClient(
-            'https://bnfwhlvtxemldrcrhvhg.supabase.co', 
-            'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik'
-        );
+        // إعداد العميل
+        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
+        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function fetchSignals() {
+        async function loadSignals() {
             const container = document.getElementById('signals-container');
-            
-            // محاولة الجلب
-            const { data, error } = await supabase.from('signals').select('*');
-            
-            // إذا حدث خطأ، سيظهر الآن على الشاشة بدلاً من "جاري التحميل"
-            if (error) {
-                container.innerHTML = "خطأ في جلب البيانات: " + error.message;
-                return;
-            }
+            try {
+                // جلب البيانات مع التأكد من اسم الجدول 'signals'
+                const { data, error } = await supabase
+                    .from('signals')
+                    .select('asset, direction, confidence');
 
-            if (!data || data.length === 0) {
-                container.innerHTML = "قاعدة البيانات فارغة أو لا يمكن الوصول للجدول.";
-                return;
-            }
+                if (error) throw error;
 
-            container.innerHTML = '';
-            data.forEach(s => {
-                container.innerHTML += `<div class="signal-card">
-                    <h3>${s.asset || 'بدون اسم'}</h3>
-                    <p>الاتجاه: ${s.direction || 'غير محدد'}</p>
-                    <p>الثقة: ${s.confidence || 0}%</p>
-                </div>`;
-            });
+                if (!data || data.length === 0) {
+                    container.innerHTML = "لا توجد إشارات حالياً في قاعدة البيانات.";
+                } else {
+                    container.innerHTML = '';
+                    data.forEach(s => {
+                        container.innerHTML += `
+                            <div class="signal-card">
+                                <h3>الزوج: ${s.asset || 'غير متاح'}</h3>
+                                <p>الاتجاه: ${s.direction || 'غير متاح'}</p>
+                                <p>الثقة: ${s.confidence || '0'}%</p>
+                            </div>`;
+                    });
+                }
+            } catch (err) {
+                container.innerHTML = "خطأ في الاتصال: " + err.message;
+            }
         }
         
-        fetchSignals();
+        loadSignals();
     </script>
 </body>
 </html>
