@@ -6,12 +6,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #0c0b1a; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
-        .signal-card { background: #1a1a2e; border: 1px solid #4e4e6a; padding: 15px; margin: 10px auto; border-radius: 10px; max-width: 350px; }
+        .signal-card { border: 1px solid #4e4e6a; padding: 15px; margin: 10px auto; border-radius: 10px; max-width: 350px; background: #1a1a2e; }
     </style>
 </head>
 <body>
     <h1>إشارات التداول</h1>
-    <div id="signals-container">جارٍ البحث عن الإشارات...</div>
+    <div id="signals-container">جاري فحص الاتصال...</div>
 
     <script>
         // إعداد العميل
@@ -21,28 +21,30 @@
 
         async function loadSignals() {
             const container = document.getElementById('signals-container');
+            
             try {
-                // جلب البيانات مع التأكد من اسم الجدول 'signals'
+                // جلب البيانات من جدول signals
                 const { data, error } = await supabase
                     .from('signals')
-                    .select('asset, direction, confidence');
+                    .select('*'); // جلب جميع الأعمدة
 
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    container.innerHTML = "لا توجد إشارات حالياً في قاعدة البيانات.";
+                    container.innerHTML = "قاعدة البيانات فارغة حالياً.";
                 } else {
                     container.innerHTML = '';
                     data.forEach(s => {
                         container.innerHTML += `
                             <div class="signal-card">
-                                <h3>الزوج: ${s.asset || 'غير متاح'}</h3>
-                                <p>الاتجاه: ${s.direction || 'غير متاح'}</p>
-                                <p>الثقة: ${s.confidence || '0'}%</p>
+                                <h3>الزوج: ${s.asset || 'غير محدد'}</h3>
+                                <p>الاتجاه: ${s.direction || 'غير محدد'}</p>
+                                <p>الثقة: ${s.confidence || 0}%</p>
                             </div>`;
                     });
                 }
             } catch (err) {
+                // هذا الجزء سيظهر الخطأ الحقيقي على الشاشة إذا وجد
                 container.innerHTML = "خطأ في الاتصال: " + err.message;
             }
         }
