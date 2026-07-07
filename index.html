@@ -2,54 +2,40 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BrightNest Oracle</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { background: #0c0b1a; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
-        .signal-card { background: #1a1a2e; padding: 20px; margin: 15px auto; border-radius: 12px; border: 1px solid #4e4e6a; max-width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        h1 { color: #4ecca3; }
-    </style>
 </head>
 <body>
     <h1>إشارات التداول</h1>
-    <div id="signals-container">جاري تحميل الإشارات...</div>
+    <div id="signals-container">جاري التحميل...</div>
 
     <script>
-        // إعداد الاتصال بـ Supabase
-        const supabaseUrl = 'https://bnfwhlvtxemldrcrhvhg.supabase.co';
-        const supabaseKey = 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabase = supabase.createClient('https://bnfwhlvtxemldrcrhvhg.supabase.co', 'sb_publishable_vbbmxwqOzNif8GKsD3r6-Q_FfuNB3Ik');
 
         async function fetchSignals() {
             const container = document.getElementById('signals-container');
-            
-            // جلب البيانات من جدول signals
             const { data, error } = await supabase.from('signals').select('*');
             
             if (error) {
-                container.innerHTML = "حدث خطأ في الاتصال: " + error.message;
-                console.error("خطأ Supabase:", error);
+                container.innerHTML = "خطأ من قاعدة البيانات: " + error.message;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = "قاعدة البيانات فارغة حالياً (لا توجد إشارات).";
                 return;
             }
 
             container.innerHTML = '';
-            if (data && data.length > 0) {
-                data.forEach(signal => {
-                    container.innerHTML += `
-                        <div class="signal-card">
-                            <h3>${signal.asset || 'بدون اسم'}</h3>
-                            <p>الاتجاه: ${signal.direction || 'غير محدد'}</p>
-                            <p>نسبة الثقة: ${signal.confidence || 0}%</p>
-                        </div>
-                    `;
-                });
-            } else {
-                container.innerHTML = "<p>لا توجد إشارات حالياً.</p>";
-            }
+            data.forEach(s => {
+                // ملاحظة: تأكد أن هذه الأسماء هي نفسها الموجودة في Supabase
+                container.innerHTML += `<div style="border:1px solid #4e4e6a; padding:10px; margin:10px;">
+                    <h3>${s.asset || 'غير معروف'}</h3>
+                    <p>الاتجاه: ${s.direction || 'غير معروف'}</p>
+                    <p>الثقة: ${s.confidence || 0}%</p>
+                </div>`;
+            });
         }
-
-        // تشغيل الدالة عند تحميل الصفحة
         fetchSignals();
     </script>
 </body>
